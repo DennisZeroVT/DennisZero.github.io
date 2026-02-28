@@ -17,36 +17,48 @@
       color: white;
     }
 
-    /* ============================
-       MUSIC PLAYER TOGGLE
-    ============================ */
-
-    .music-toggle {
+    .music-controls {
       position: fixed;
       bottom: 20px;
       right: 20px;
       z-index: 999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
       background: rgba(74, 53, 104, 0.9);
       border: 2px solid #ffffff55;
-      color: #d6c8ff;
-      padding: 10px 14px;
-      cursor: pointer;
+      padding: 8px 14px;
       border-radius: 50px;
-      font-size: 13px;
-      font-weight: bold;
       backdrop-filter: blur(4px);
       box-shadow: 0 0 10px #00000088;
-      transition: background 0.2s;
     }
 
-    .music-toggle:hover {
-      background: rgba(106, 82, 160, 0.95);
-      border-color: #ffffffaa;
+    .music-controls button {
+      background: none;
+      border: none;
+      color: #d6c8ff;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 0;
+      white-space: nowrap;
     }
 
-    /* ============================
-       SIDEBAR / TOP NAV
-    ============================ */
+    .music-controls .divider {
+      color: #ffffff44;
+      font-size: 16px;
+    }
+
+    .music-controls span.icon {
+      font-size: 13px;
+      color: #d6c8ff;
+    }
+
+    .music-controls input[type="range"] {
+      width: 80px;
+      accent-color: #a080e0;
+      cursor: pointer;
+    }
 
     .sidebar {
       width: 200px;
@@ -79,7 +91,6 @@
       border-color: #ffffffaa;
     }
 
-    /* Mobile top nav (hidden on desktop) */
     .top-nav {
       display: none;
       background: rgba(43, 33, 64, 0.95);
@@ -108,10 +119,6 @@
     .top-nav button:hover {
       background: #6a52a0;
     }
-
-    /* ============================
-       LAYOUT
-    ============================ */
 
     .content-wrapper {
       margin-left: 200px;
@@ -221,10 +228,6 @@
       display: block;
     }
 
-    /* ============================
-       MOBILE STYLES
-    ============================ */
-
     @media (max-width: 700px) {
       .sidebar {
         display: none;
@@ -288,9 +291,18 @@
       iframe {
         height: 200px;
       }
+
+      .music-controls {
+        bottom: 12px;
+        right: 12px;
+        padding: 6px 10px;
+      }
+
+      .music-controls input[type="range"] {
+        width: 60px;
+      }
     }
 
-    /* Tablet */
     @media (min-width: 701px) and (max-width: 960px) {
       .sidebar {
         width: 160px;
@@ -317,18 +329,23 @@
     <source src="Suisai.m4a" type="audio/mp4">
   </audio>
 
-  <!-- Music toggle button -->
-  <button class="music-toggle" id="musicBtn" onclick="toggleMusic()">♪ Music: ON</button>
+  <!-- Music controls -->
+  <div class="music-controls">
+    <button id="musicBtn" onclick="toggleMusic()">♪ Music: ON</button>
+    <span class="divider">|</span>
+    <span class="icon">🔊</span>
+    <input type="range" id="volumeSlider" min="0" max="100" value="40" oninput="changeVolume(this.value)">
+  </div>
 
   <script>
     const audio = document.getElementById('bgMusic');
     const btn = document.getElementById('musicBtn');
     let playing = false;
 
-    // Autoplay on first user interaction (required by browsers)
+    audio.volume = 0.4;
+
     function startMusic() {
       if (!playing) {
-        audio.volume = 0.4;
         audio.play().then(() => {
           playing = true;
           btn.textContent = '♪ Music: ON';
@@ -337,13 +354,10 @@
       document.removeEventListener('click', startMusic);
     }
 
-    // Try immediate autoplay first
-    audio.volume = 0.4;
     audio.play().then(() => {
       playing = true;
       btn.textContent = '♪ Music: ON';
     }).catch(() => {
-      // Blocked by browser — wait for first click
       btn.textContent = '♪ Music: OFF';
       document.addEventListener('click', startMusic);
     });
@@ -359,119 +373,124 @@
         btn.textContent = '♪ Music: ON';
       }
     }
+
+    function changeVolume(val) {
+      audio.volume = val / 100;
+    }
   </script>
 
-<!-- Mobile top nav -->
-<nav class="top-nav">
-  <button onclick="location.href='index.html'">Home</button>
-  <button onclick="location.href='songs.html'">Songs</button>
-</nav>
+  <!-- Mobile top nav -->
+  <nav class="top-nav">
+    <button onclick="location.href='index.html'">Home</button>
+    <button onclick="location.href='songs.html'">Songs</button>
+  </nav>
 
-<!-- Desktop sidebar -->
-<div class="sidebar">
-  <button onclick="location.href='index.html'">Home</button>
-  <button onclick="location.href='songs.html'">Songs</button>
-</div>
+  <!-- Desktop sidebar -->
+  <div class="sidebar">
+    <button onclick="location.href='index.html'">Home</button>
+    <button onclick="location.href='songs.html'">Songs</button>
+  </div>
 
-<div class="content-wrapper">
+  <div class="content-wrapper">
 
-  <div class="left-column">
+    <div class="left-column">
 
-    <div class="pfp-box">
-      <img src="pfp.png" alt="Profile picture">
+      <div class="pfp-box">
+        <img src="pfp.png" alt="Profile picture">
+      </div>
+
+      <div class="bio-box">
+        <h3>Likes</h3>
+        <p>
+          Sonic.<br>
+          My little Pony.<br>
+          Making music.<br>
+          Music.<br>
+          Old aesthetics.<br>
+          Emulators.<br>
+          Anime.<br>
+          Cats.<br>
+          Blue Archive.<br>
+        </p>
+      </div>
+
+      <div class="bio-box">
+        <h3>Dislikes</h3>
+        <p>
+          Gore.<br>
+          Blood.<br>
+          Spiders.<br>
+          The unknown.<br>
+          Death.<br>
+        </p>
+      </div>
+
+      <div class="bio-box">
+        <h3>Info badges</h3>
+        <p>
+          <img class="badge-img" src="1.png" alt="badge">
+          <img class="badge-img" src="11.png" alt="badge">
+          <img class="badge-img" src="111.png" alt="badge">
+          <img class="badge-img" src="1111.png" alt="badge">
+          <img class="badge-img" src="11111.png" alt="badge">
+          <img class="badge-img" src="111111.png" alt="badge">
+          <img class="badge-img" src="2.png" alt="badge">
+          <img class="badge-img" src="22.png" alt="badge">
+          <img class="badge-img" src="222.png" alt="badge">
+        </p>
+      </div>
+
     </div>
 
-    <div class="bio-box">
-      <h3>Likes</h3>
-      <p>
-        Sonic.<br>
-        My little Pony.<br>
-        Making music.<br>
-        Music.<br>
-        Old aesthetics.<br>
-        Emulators.<br>
-        Anime.<br>
-        Cats.<br>
-        Blue Archive.<br>
-      </p>
-    </div>
+    <div class="main-panel">
+      <h2>My Story</h2>
 
-    <div class="bio-box">
-      <h3>Dislikes</h3>
       <p>
-        Gore.<br>
-        Blood.<br>
-        Spiders.<br>
-        The unknown.<br>
-        Death.<br>
+        My name is <b>Dennis van Wijngaarden</b>, and I have always had a passion for video games and music. I started creating video games many years ago, and during that time I discovered how much I enjoyed making music. That moment pushed me toward becoming a music producer.
       </p>
-    </div>
 
-    <div class="bio-box">
-      <h3>Info badges</h3>
       <p>
-        <img class="badge-img" src="1.png" alt="badge">
-        <img class="badge-img" src="11.png" alt="badge">
-        <img class="badge-img" src="111.png" alt="badge">
-        <img class="badge-img" src="1111.png" alt="badge">
-        <img class="badge-img" src="11111.png" alt="badge">
-        <img class="badge-img" src="111111.png" alt="badge">
-        <img class="badge-img" src="2.png" alt="badge">
-        <img class="badge-img" src="22.png" alt="badge">
-        <img class="badge-img" src="222.png" alt="badge">
+        Over the years, I tried many different DAWs. I started with FL Studio, then moved on to Cubase and Studio One. Each one helped me learn more about producing and finding my own style.
       </p>
+
+      <div class="bio-box">
+        <h3>My Catalyst Vivid</h3>
+        <p>
+          In 2025, I tried joining Discord communities again for the first time in many years. I slowly started interacting with people, and in my very first server I met someone named VividExile. Even though I often felt alone in that server, I somehow felt connected to him. He seemed troubled by his life, since he is an ex‑military veteran, but he still showed a lot of strength and kindness.
+        </p>
+        <p>
+          As we talked more, I noticed his health and energy were often low, and I tried my best to support him. At the same time, he supported me too. We helped each other through a lot, and that connection meant more than I expected. Looking back, I think the server owner probably hurt his feelings as well, not just mine.
+        </p>
+        <p>
+          Even though the owner of that first server ended up hurting me, meeting Vivid proved that I could keep going and do more than I thought. He was also the reason I became a streamer again, and through him I met many new people, including Erik.
+        </p>
+        <img class="vivid-img" src="vivid.png" alt="Vivid pfp">
+      </div>
+
+      <div class="bio-box">
+        <h3>Meeting Erik and My First Song</h3>
+        <p>
+          When the first server owner turned out to be a bad person, I followed Vivid to a Discord server run by a VTuber. After a few weeks in that community, I came across someone named Erik. I first noticed him because of a Twitter post where he made the Devourer of Gods his pet, and I thought it was really funny. I've always loved Terraria, so it immediately caught my attention.
+        </p>
+        <p>
+          As I started interacting with him, we slowly began collaborating, playing together, as he became my friend. Around that time, I mentioned that I wanted to make a song again, and that I didn't mind making one for free. Erik told me he would love to have a song, and that simple moment was what started everything. Over time, our connection made the idea of creating music feel exciting again.
+        </p>
+        <p>
+          That led to the creation of my first released song. In 2025, I published it on music platforms like Spotify. The track was called <i>Snowfall</i>, and it was made for Erik, also known as eri_k416. The song was written about his character Viona, and it was also the first time I ever wrote lyrics for a song. Because of that, <i>Snowfall</i> became a very special and meaningful project for me.
+        </p>
+        <iframe src="https://open.spotify.com/embed/track/0TxrNlfNSlwuncbt0wpVH6?utm_source=generator"
+          width="100%" height="352" frameBorder="0" allowfullscreen=""
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"></iframe>
+      </div>
+
     </div>
 
   </div>
-
-  <div class="main-panel">
-    <h2>My Story</h2>
-
-    <p>
-      My name is <b>Dennis van Wijngaarden</b>, and I have always had a passion for video games and music. I started creating video games many years ago, and during that time I discovered how much I enjoyed making music. That moment pushed me toward becoming a music producer.
-    </p>
-
-    <p>
-      Over the years, I tried many different DAWs. I started with FL Studio, then moved on to Cubase and Studio One. Each one helped me learn more about producing and finding my own style.
-    </p>
-
-    <div class="bio-box">
-      <h3>My Catalyst Vivid</h3>
-      <p>
-        In 2025, I tried joining Discord communities again for the first time in many years. I slowly started interacting with people, and in my very first server I met someone named VividExile. Even though I often felt alone in that server, I somehow felt connected to him. He seemed troubled by his life, since he is an ex‑military veteran, but he still showed a lot of strength and kindness.
-      </p>
-      <p>
-        As we talked more, I noticed his health and energy were often low, and I tried my best to support him. At the same time, he supported me too. We helped each other through a lot, and that connection meant more than I expected. Looking back, I think the server owner probably hurt his feelings as well, not just mine.
-      </p>
-      <p>
-        Even though the owner of that first server ended up hurting me, meeting Vivid proved that I could keep going and do more than I thought. He was also the reason I became a streamer again, and through him I met many new people, including Erik.
-      </p>
-      <img class="vivid-img" src="vivid.png" alt="Vivid pfp">
-    </div>
-
-    <div class="bio-box">
-      <h3>Meeting Erik and My First Song</h3>
-      <p>
-        When the first server owner turned out to be a bad person, I followed Vivid to a Discord server run by a VTuber. After a few weeks in that community, I came across someone named Erik. I first noticed him because of a Twitter post where he made the Devourer of Gods his pet, and I thought it was really funny. I've always loved Terraria, so it immediately caught my attention.
-      </p>
-      <p>
-        As I started interacting with him, we slowly began collaborating, playing together, as he became my friend. Around that time, I mentioned that I wanted to make a song again, and that I didn't mind making one for free. Erik told me he would love to have a song, and that simple moment was what started everything. Over time, our connection made the idea of creating music feel exciting again.
-      </p>
-      <p>
-        That led to the creation of my first released song. In 2025, I published it on music platforms like Spotify. The track was called <i>Snowfall</i>, and it was made for Erik, also known as eri_k416. The song was written about his character Viona, and it was also the first time I ever wrote lyrics for a song. Because of that, <i>Snowfall</i> became a very special and meaningful project for me.
-      </p>
-      <iframe src="https://open.spotify.com/embed/track/0TxrNlfNSlwuncbt0wpVH6?utm_source=generator"
-        width="100%" height="352" frameBorder="0" allowfullscreen=""
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-        loading="lazy"></iframe>
-    </div>
-
-  </div>
-
-</div>
 
 </body>
 </html>
+
 
 
 
