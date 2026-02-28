@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
+<title>Background audio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About Me</title>
   <style>
@@ -289,6 +291,14 @@
 
 <body>
 
+  <!-- Hidden background audio -->
+  <audio id="bg-audio" autoplay loop>
+    <source src="suisai - calm down (ft. skele) [lyrics].m4a" type="audio/mp4">
+    <!-- Fallback formats (optional) -->
+    <source src="music.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
 <!-- Mobile top nav -->
 <nav class="top-nav">
   <button onclick="location.href='index.html'">Home</button>
@@ -398,5 +408,15 @@
 
 </div>
 
+  <script>
+    // Try to resume autoplay if the browser blocks it
+    document.addEventListener('click', function once() {
+      const audio = document.getElementById('bg-audio');
+      if (audio.paused) audio.play().catch(() => {});
+      document.removeEventListener('click', once);
+    });
+  </script>
+
 </body>
+
 </html>
