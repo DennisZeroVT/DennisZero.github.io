@@ -354,12 +354,54 @@
         height: 200px;
       }
 
-      .music-controls {
-        bottom: 15px;
-        left: 15px;
-        min-width: 130px;
-        padding: 12px;
-      }
+      /* Expandable Music Player */
+.music-wrapper {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 200;
+}
+
+/* Small collapsed button */
+.music-toggle-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #4a3568;
+  color: #d6c8ff;
+  border: 2px solid #ffffff55;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 0 10px #000000aa;
+  transition: all 0.3s ease;
+}
+
+.music-toggle-btn:hover {
+  background: #6a52a0;
+}
+
+/* Hidden panel */
+.music-controls {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  background: rgba(43, 33, 64, 0.95);
+  border: 2px solid #ffffff33;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 10px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 0 10px #000000aa;
+  min-width: 140px;
+}
+
+/* Expanded state */
+.music-wrapper.expanded .music-controls {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
 
       .music-button {
         padding: 8px 12px;
@@ -408,13 +450,20 @@
 </div>
 
 <!-- Music Controls -->
-<div class="music-controls">
-  <button class="music-button" id="musicToggle" onclick="toggleMusic()">🎵 Play Music</button>
-  <div class="volume-container">
-    <span class="volume-label">🔊</span>
-    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70" onchange="setVolume()">
+<!-- Expandable Music Player -->
+<div class="music-wrapper" id="musicWrapper">
+  <button class="music-toggle-btn" onclick="toggleMusicPanel()">🎵</button>
+
+  <div class="music-controls">
+    <button class="music-button" id="musicToggle" onclick="toggleMusic()">🎵 Play Music</button>
+
+    <div class="volume-container">
+      <span class="volume-label">🔊</span>
+      <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70" onchange="setVolume()">
+    </div>
   </div>
 </div>
+
 
 <div class="content-wrapper">
 
@@ -514,6 +563,12 @@
 </div>
 
 <script>
+
+  function toggleMusicPanel() {
+  const wrapper = document.getElementById('musicWrapper');
+  wrapper.classList.toggle('expanded');
+}
+ 
   const bgMusic = document.getElementById('bgMusic');
   const musicToggle = document.getElementById('musicToggle');
   const volumeSlider = document.getElementById('volumeSlider');
