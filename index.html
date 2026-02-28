@@ -195,6 +195,94 @@
     }
 
     /* ============================
+       MUSIC CONTROLS (Bottom Right)
+    ============================ */
+
+    .music-controls {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(43, 33, 64, 0.95);
+      border: 2px solid #ffffff33;
+      border-radius: 10px;
+      padding: 15px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 10px #000000aa;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 140px;
+    }
+
+    .music-button {
+      padding: 10px 15px;
+      background: #4a3568;
+      color: #d6c8ff;
+      border: 2px solid #ffffff55;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .music-button:hover {
+      background: #6a52a0;
+      border-color: #ffffffaa;
+    }
+
+    .music-button.playing {
+      background: #2d7f2d;
+      border-color: #88ff88;
+    }
+
+    .volume-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .volume-label {
+      font-size: 12px;
+      color: #d6c8ff;
+      white-space: nowrap;
+    }
+
+    .volume-slider {
+      flex: 1;
+      height: 6px;
+      cursor: pointer;
+      background: #ffffff33;
+      border-radius: 3px;
+      -webkit-appearance: none;
+      appearance: none;
+      outline: none;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      background: #d6c8ff;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 3px #000000aa;
+    }
+
+    .volume-slider::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      background: #d6c8ff;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 3px #000000aa;
+      border: none;
+    }
+
+    /* ============================
        MOBILE STYLES
     ============================ */
 
@@ -265,6 +353,18 @@
       iframe {
         height: 200px;
       }
+
+      .music-controls {
+        bottom: 15px;
+        right: 15px;
+        min-width: 130px;
+        padding: 12px;
+      }
+
+      .music-button {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
     }
 
     /* Tablet */
@@ -289,9 +389,10 @@
 
 <body>
 
-<!-- Invisible Audio Player -->
-<audio id="backgroundAudio" preload="auto">
+<!-- Audio Element (Hidden) -->
+<audio id="bgMusic">
   <source src="Suisai.m4a" type="audio/mp4">
+  Your browser does not support the audio element.
 </audio>
 
 <!-- Mobile top nav -->
@@ -304,6 +405,15 @@
 <div class="sidebar">
   <button onclick="location.href='index.html'">Home</button>
   <button onclick="location.href='songs.html'">Songs</button>
+</div>
+
+<!-- Music Controls -->
+<div class="music-controls">
+  <button class="music-button" id="musicToggle" onclick="toggleMusic()">🎵 Play Music</button>
+  <div class="volume-container">
+    <span class="volume-label">🔊</span>
+    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70" onchange="setVolume()">
+  </div>
 </div>
 
 <div class="content-wrapper">
@@ -404,27 +514,65 @@
 </div>
 
 <script>
-  const audioElement = document.getElementById('backgroundAudio');
-  let audioStarted = false;
+  const bgMusic = document.getElementById('bgMusic');
+  const musicToggle = document.getElementById('musicToggle');
+  const volumeSlider = document.getElementById('volumeSlider');
+  let isPlaying = false;
+  let userInteracted = false;
 
-  // Function to start audio playback
-  function startAudio() {
-    if (!audioStarted) {
-      audioElement.play().catch(error => {
-        console.log('Audio autoplay prevented:', error);
+  // Function to toggle music
+  function toggleMusic() {
+    if (isPlaying) {
+      bgMusic.pause();
+      isPlaying = false;
+      musicToggle.textContent = '🎵 Play Music';
+      musicToggle.classList.remove('playing');
+    } else {
+      bgMusic.play().catch(error => {
+        console.log('Autoplay prevented:', error);
       });
-      audioStarted = true;
+      isPlaying = true;
+      musicToggle.textContent = '⏸ Stop Music';
+      musicToggle.classList.add('playing');
     }
   }
 
-  // Listen for user interactions
-  document.addEventListener('click', startAudio);
-  document.addEventListener('touchstart', startAudio);
-  document.addEventListener('keydown', startAudio);
+  // Function to set volume
+  function setVolume() {
+    bgMusic.volume = volumeSlider.value / 100;
+  }
 
-  // Also try to start on page load (may be blocked by browser autoplay policy)
-  window.addEventListener('load', () => {
-    startAudio();
+  // Initialize volume
+  setVolume();
+
+  // Detect user interaction (scroll, click, etc.) to enable autoplay
+  function enableAutoplay() {
+    if (!userInteracted) {
+      userInteracted = true;
+      // Auto-play the music on first user interaction
+      bgMusic.play().catch(error => {
+        console.log('Autoplay prevented:', error);
+      });
+      isPlaying = true;
+      musicToggle.textContent = '⏸ Stop Music';
+      musicToggle.classList.add('playing');
+      
+      // Remove event listeners after first interaction
+      document.removeEventListener('click', enableAutoplay);
+      document.removeEventListener('scroll', enableAutoplay);
+      document.removeEventListener('keydown', enableAutoplay);
+    }
+  }
+
+  // Add event listeners for user interactions
+  document.addEventListener('click', enableAutoplay);
+  document.addEventListener('scroll', enableAutoplay);
+  document.addEventListener('keydown', enableAutoplay);
+
+  // Loop the music
+  bgMusic.addEventListener('ended', () => {
+    bgMusic.currentTime = 0;
+    bgMusic.play();
   });
 </script>
 
