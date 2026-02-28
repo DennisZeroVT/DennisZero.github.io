@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Songs</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: url('backdrop.png') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Verdana, Arial, sans-serif;
+      color: white;
+      padding-bottom: 100px;
+    }
+
+    /* ============================
+       SIDEBAR
+    ============================ */
+    .sidebar {
+      width: 200px;
+      background: rgba(43, 33, 64, 0.85);
+      height: 100vh;
+      padding: 20px;
+      border-right: 3px solid #ffffff33;
+      position: fixed;
+      top: 0; left: 0;
+      backdrop-filter: blur(2px);
+      z-index: 100;
+    }
+    .sidebar button {
+      width: 100%; padding: 10px; margin-bottom: 12px;
+      background: #4a3568; color: #d6c8ff;
+      border: 2px solid #ffffff55; font-weight: bold;
+      cursor: pointer; text-align: left;
+      box-shadow: 2px 2px 4px #00000055;
+    }
+    .sidebar button:hover { background: #6a52a0; border-color: #ffffffaa; }
+
+    /* ============================
+       MOBILE TOP NAV
+    ============================ */
+    .top-nav {
+      display: none;
+      background: rgba(43, 33, 64, 0.95);
+      border-bottom: 3px solid #ffffff33;
+      padding: 10px; position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(4px); gap: 8px; flex-wrap: wrap;
+    }
+    .top-nav button {
+      flex: 1; min-width: 70px; padding: 8px 6px;
+      background: #4a3568; color: #d6c8ff;
+      border: 2px solid #ffffff55; font-weight: bold;
+      cursor: pointer; font-size: 12px;
+    }
+    .top-nav button:hover { background: #6a52a0; }
+
+    /* ============================
+       LAYOUT
+    ============================ */
+    .content-wrapper { margin-left: 200px; padding: 20px; }
+    .main-panel {
+      background: rgba(0,0,0,0.65);
+      border: 2px solid #ffffff33;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 10px #000000aa;
+      border-radius: 10px;
+    }
+    .main-panel h2 { margin-bottom: 6px; }
+    .section-desc { color: #a08ccc; font-size: 13px; margin-bottom: 20px; }
+    .section-title {
+      font-size: 11px; text-transform: uppercase;
+      letter-spacing: 3px; color: #9b7fcc;
+      margin: 0 0 16px; padding-bottom: 8px;
+      border-bottom: 1px solid #ffffff22;
+    }
+
+    /* ============================
+       SONG CARDS
+    ============================ */
+    .songs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 16px;
+    }
+
+    .song-card {
+      background: rgba(0,0,0,0.5);
+      border: 2px solid #ffffff22;
+      border-radius: 12px;
+      overflow: hidden;
+      backdrop-filter: blur(3px);
+      box-shadow: 0 0 12px #00000077;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+      cursor: pointer;
+    }
+    .song-card:hover {
+      border-color: #8b5cf688;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 24px #8b5cf633;
+    }
+
+    .song-cover {
+      width: 100%; aspect-ratio: 1;
+      background: linear-gradient(135deg, #3a2060, #6a3fa0);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 56px;
+      position: relative; overflow: hidden;
+    }
+    .song-cover img { width: 100%; height: 100%; object-fit: cover; }
+
+    .card-hover-layer {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.2s;
+      flex-direction: column; gap: 8px;
+    }
+    .song-card:hover .card-hover-layer { opacity: 1; }
+    .card-open-btn {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: #8b5cf6; border: none;
+      color: white; font-size: 20px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px #00000088;
+    }
+    .card-hover-layer span {
+      font-size: 10px; color: #d6c8ff;
+      letter-spacing: 1.5px; text-transform: uppercase;
+    }
+
+    .card-body { padding: 14px; }
+    .song-name { font-size: 15px; font-weight: bold; margin-bottom: 4px; }
+    .song-meta { font-size: 11px; color: #9b7fcc; margin-bottom: 8px; }
+    .song-desc { font-size: 12px; color: #cccccc; line-height: 1.6; }
+    .song-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; font-weight: bold; letter-spacing: 0.5px; }
+    .badge-released { background: #1a3a1a; color: #6ddc6d; border: 1px solid #6ddc6d55; }
+    .badge-spotify  { background: #0a2a1a; color: #1db954; border: 1px solid #1db95455; }
+
+    /* ============================
+       FULLSCREEN OVERLAY
+    ============================ */
+    .song-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      display: flex;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .song-overlay.open { opacity: 1; pointer-events: all; }
+
+    /* blurred backdrop behind overlay */
+    .song-overlay::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(6, 3, 16, 0.96);
+      backdrop-filter: blur(12px);
+    }
+
+    .overlay-inner {
+      position: relative;
+      display: flex; width: 100%;
+      transform: translateY(28px);
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .song-overlay.open .overlay-inner { transform: translateY(0); }
+
+    /* ── left panel ── */
+    .ov-left {
+      width: 360px; min-width: 300px; flex-shrink: 0;
+      border-right: 1px solid #ffffff11;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 40px 28px; gap: 22px;
+      background: rgba(0,0,0,0.25);
+    }
+
+    .ov-cover {
+      width: 220px; height: 220px; border-radius: 16px;
+      background: linear-gradient(135deg, #3a2060, #6a3fa0);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 76px;
+      box-shadow: 0 8px 40px #00000099;
+      overflow: hidden; flex-shrink: 0;
+      transition: transform 0.1s;
+    }
+    .ov-cover img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
+    .ov-cover.spinning { animation: spin-cover 8s linear infinite; }
+    @keyframes spin-cover { to { transform: rotate(360deg); } }
+
+    .ov-title-block { text-align: center; }
+    .ov-track-name { font-size: 20px; font-weight: bold; }
+    .ov-track-artist { font-size: 12px; color: #9b7fcc; margin-top: 4px; }
+
+    .ov-progress-area { width: 100%; }
+    .ov-bar {
+      width: 100%; height: 4px; background: #ffffff22;
+      border-radius: 2px; cursor: pointer; margin-bottom: 6px;
+    }
+    .ov-bar-fill {
+      height: 100%; border-radius: 2px; width: 0%;
+      background: linear-gradient(90deg, #8b5cf6, #c084fc);
+      transition: width 0.4s linear; pointer-events: none;
+    }
+    .ov-times { display: flex; justify-content: space-between; font-size: 10px; color: #9b7fcc; }
+
+    .ov-controls { display: flex; align-items: center; gap: 14px; }
+    .ov-btn {
+      background: rgba(255,255,255,0.08); border: 1px solid #ffffff33;
+      color: white; width: 38px; height: 38px; border-radius: 50%;
+      cursor: pointer; font-size: 15px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .ov-btn:hover { background: rgba(255,255,255,0.2); }
+    .ov-play {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      border: none; color: white; font-size: 22px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px #8b5cf666;
+      transition: transform 0.15s;
+    }
+    .ov-play:hover { transform: scale(1.08); }
+
+    .ov-volume { display: flex; align-items: center; gap: 8px; width: 100%; }
+    .ov-volume span { font-size: 14px; }
+    .ov-volume input[type=range] {
+      flex: 1; -webkit-appearance: none;
+      height: 3px; background: #ffffff33; border-radius: 2px; outline: none; cursor: pointer;
+    }
+    .ov-volume input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 12px; height: 12px;
+      border-radius: 50%; background: #a78bfa; cursor: pointer;
+    }
+
+    /* ── right panel ── */
+    .ov-right {
+      flex: 1; overflow-y: auto;
+      padding: 50px 44px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    .ov-close {
+      position: absolute; top: 20px; right: 24px;
+      background: rgba(255,255,255,0.08); border: 1px solid #ffffff33;
+      color: white; width: 40px; height: 40px; border-radius: 50%;
+      font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s; z-index: 10;
+    }
+    .ov-close:hover { background: rgba(255,255,255,0.22); }
+
+    .ov-header-label {
+      font-size: 10px; text-transform: uppercase;
+      letter-spacing: 3px; color: #7c5cbf; margin-bottom: 8px;
+    }
+    .ov-header-title { font-size: 30px; font-weight: bold; line-height: 1.2; margin-bottom: 4px; }
+    .ov-header-year  { font-size: 13px; color: #9b7fcc; margin-bottom: 12px; }
+    .ov-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .ov-block {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid #ffffff11;
+      border-radius: 12px; padding: 20px 22px;
+    }
+    .ov-block-title {
+      font-size: 10px; text-transform: uppercase;
+      letter-spacing: 2px; color: #8b5cf6; margin-bottom: 10px;
+    }
+    .ov-block p { font-size: 13px; line-height: 1.9; color: #d6c8ff; }
+
+    .ov-spotify iframe { border-radius: 12px; display: block; }
+
+    /* ============================
+       UNIVERSAL BOTTOM PLAYER
+    ============================ */
+    .universal-player {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 88px;
+      background: rgba(18, 10, 35, 0.97);
+      border-top: 2px solid #ffffff22;
+      backdrop-filter: blur(20px);
+      display: flex; align-items: center;
+      padding: 0 24px; gap: 20px;
+      z-index: 200;
+      box-shadow: 0 -4px 30px #00000099;
+      transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+    .universal-player.hidden { transform: translateY(100%); opacity: 0; pointer-events: none; }
+
+    .up-track { display: flex; align-items: center; gap: 12px; width: 220px; min-width: 0; flex-shrink: 0; }
+    .up-disc {
+      width: 50px; height: 50px; border-radius: 8px;
+      background: linear-gradient(135deg, #3a2060, #6a3fa0);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0; overflow: hidden;
+    }
+    .up-disc img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+    .up-disc.spinning { animation: spin-disc 6s linear infinite; }
+    @keyframes spin-disc { to { transform: rotate(360deg); } }
+    .up-track-name { font-size: 13px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .up-track-artist { font-size: 11px; color: #9b7fcc; margin-top: 2px; }
+    .up-idle { color: #555; font-size: 13px; font-style: italic; }
+
+    .up-center { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .up-controls { display: flex; align-items: center; gap: 12px; }
+    .up-btn {
+      background: none; border: none; color: #cccccc; cursor: pointer; font-size: 16px;
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.15s, background 0.15s;
+    }
+    .up-btn:hover { color: white; background: rgba(255,255,255,0.1); }
+    .up-play {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      border: none; color: white; border-radius: 50%; font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.15s; box-shadow: 0 2px 12px #8b5cf655;
+    }
+    .up-play:hover { transform: scale(1.08); }
+
+    .up-progress-row { width: 100%; display: flex; align-items: center; gap: 8px; font-size: 10px; color: #9b7fcc; }
+    .up-bar { flex: 1; height: 4px; background: #ffffff22; border-radius: 2px; cursor: pointer; }
+    .up-bar-fill {
+      height: 100%; border-radius: 2px; width: 0%;
+      background: linear-gradient(90deg, #8b5cf6, #c084fc);
+      transition: width 0.4s linear; pointer-events: none;
+    }
+
+    .up-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .up-right span { font-size: 14px; }
+    .up-right input[type=range] {
+      width: 90px; -webkit-appearance: none;
+      height: 3px; background: #ffffff33; border-radius: 2px; outline: none; cursor: pointer;
+    }
+    .up-right input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 12px; height: 12px;
+      border-radius: 50%; background: #a78bfa; cursor: pointer;
+    }
+
+    /* ============================
+       RESPONSIVE
+    ============================ */
+    @media (min-width: 701px) and (max-width: 960px) {
+      .sidebar { width: 160px; }
+      .content-wrapper { margin-left: 160px; padding: 14px; }
+      .ov-left { width: 280px; min-width: 240px; padding: 28px 18px; }
+      .ov-cover { width: 180px; height: 180px; }
+      .ov-right { padding: 36px 24px; }
+    }
+    @media (max-width: 700px) {
+      .sidebar { display: none; }
+      .top-nav { display: flex; }
+      .content-wrapper { margin-left: 0; padding: 12px; }
+      .up-track { width: 130px; }
+      .up-right { display: none; }
+      .universal-player { padding: 0 12px; gap: 12px; }
+      .overlay-inner { flex-direction: column; overflow-y: auto; }
+      .ov-left { width: 100%; min-width: unset; border-right: none; border-bottom: 1px solid #ffffff11; padding: 28px 18px; gap: 16px; }
+      .ov-cover { width: 160px; height: 160px; font-size: 56px; }
+      .ov-right { padding: 24px 16px; }
+      .ov-header-title { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Mobile top nav -->
+<nav class="top-nav">
+  <button onclick="location.href='index.html'">Home</button>
+  <button onclick="location.href='songs.html'">Songs</button>
+</nav>
+
+<!-- Desktop sidebar -->
+<div class="sidebar">
+  <button onclick="location.href='index.html'">Home</button>
+  <button onclick="location.href='songs.html'">Songs</button>
+</div>
+
+<div class="content-wrapper">
+  <div class="main-panel">
+    <h2>My Songs</h2>
+    <p class="section-desc">Click a song to hear it and read the story behind it.</p>
+
+    <div class="section-title" style="margin-top:18px;">Released</div>
+    <div class="songs-grid">
+
+      <!-- SNOWFALL CARD -->
+      <div class="song-card" onclick="openSong('snowfall')">
+        <div class="song-cover">
+          🌨️
+          <div class="card-hover-layer">
+            <div class="card-open-btn">▶</div>
+            <span>Open</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="song-name">Snowfall</div>
+          <div class="song-meta">2025</div>
+          <div class="song-desc">My first ever released song, written for a friend.</div>
+          <div class="song-badges">
+            <span class="badge badge-released">Released</span>
+            <span class="badge badge-spotify">Spotify</span>
+          </div>
+        </div>
+      </div>
+
+      <!--
+        TO ADD A NEW SONG:
+        1. Copy the card block above
+        2. Change onclick="openSong('snowfall')" to a new key e.g. openSong('mysong')
+        3. Add the song data in the SONGS object in the <script> below
+      -->
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     FULLSCREEN SONG OVERLAY
+============================ -->
+<div class="song-overlay" id="songOverlay">
+  <button class="ov-close" onclick="closeOverlay()">✕</button>
+
+  <div class="overlay-inner">
+
+    <!-- Left: cover art + audio controls -->
+    <div class="ov-left">
+      <div class="ov-cover" id="ovCover">🌨️</div>
+
+      <div class="ov-title-block">
+        <div class="ov-track-name" id="ovName"></div>
+        <div class="ov-track-artist" id="ovArtist"></div>
+      </div>
+
+      <div class="ov-progress-area">
+        <div class="ov-bar" id="ovBar"><div class="ov-bar-fill" id="ovFill"></div></div>
+        <div class="ov-times"><span id="ovCur">0:00</span><span id="ovDur">0:00</span></div>
+      </div>
+
+      <div class="ov-controls">
+        <button class="ov-btn" onclick="seekBack()">⏮</button>
+        <button class="ov-play" id="ovPlayBtn" onclick="togglePlay()">▶</button>
+        <button class="ov-btn" onclick="seekFwd()">⏭</button>
+      </div>
+
+      <div class="ov-volume">
+        <span>🔊</span>
+        <input type="range" id="ovVol" min="0" max="1" step="0.01" value="0.7"
+               oninput="audio.volume = this.value">
+      </div>
+    </div>
+
+    <!-- Right: story + info -->
+    <div class="ov-right" id="ovRight"></div>
+
+  </div>
+</div>
+
+<!-- ============================
+     UNIVERSAL BOTTOM PLAYER
+============================ -->
+<audio id="mainAudio" preload="auto"></audio>
+
+<div class="universal-player" id="universalPlayer">
+  <div class="up-track">
+    <div class="up-disc" id="upDisc">🎵</div>
+    <div id="upTrackText"><div class="up-idle">No song selected</div></div>
+  </div>
+
+  <div class="up-center">
+    <div class="up-controls">
+      <button class="up-btn" onclick="seekBack()">⏮</button>
+      <button class="up-play" id="upPlayBtn" onclick="togglePlay()">▶</button>
+      <button class="up-btn" onclick="seekFwd()">⏭</button>
+    </div>
+    <div class="up-progress-row">
+      <span id="upCur">0:00</span>
+      <div class="up-bar" id="upBar"><div class="up-bar-fill" id="upFill"></div></div>
+      <span id="upDur">0:00</span>
+    </div>
+  </div>
+
+  <div class="up-right">
+    <span>🔊</span>
+    <input type="range" id="upVol" min="0" max="1" step="0.01" value="0.7"
+           oninput="audio.volume = this.value">
+  </div>
+</div>
+
+<script>
+  /* ============================================================
+     SONG DATA — edit this to add / change songs
+     ============================================================ */
+  const SONGS = {
+    snowfall: {
+      name:    'Snowfall',
+      artist:  'Dennis van Wijngaarden',
+      year:    '2025',
+      src:     'Snowfall.mp3',
+      cover:   '🌨️',   // emoji fallback if no cover image
+      coverImg: null,   // set to e.g. 'snowfall.jpg' if you have art
+      spotify: 'https://open.spotify.com/embed/track/0TxrNlfNSlwuncbt0wpVH6?utm_source=generator',
+      badges:  ['Released', 'Spotify'],
+
+      about:
+        `Snowfall was written for my friend Erik, also known as eri_k416. ` +
+        `It's built around his character Viona — a quiet, wintry figure that ` +
+        `inspired the whole mood of the track.`,
+
+      thoughts:
+        `This was the first time I ever wrote lyrics for a song. I didn't plan ` +
+        `it that way — I just wanted to make something for Erik and the words came ` +
+        `naturally. I remember sitting with the melody for a long time before anything ` +
+        `clicked. When it finally did, it felt like the song wrote itself.`,
+
+      behindTheScenes:
+        `I was using Studio One at the time. The arrangement started with just a piano ` +
+        `line and some light percussion. The winter atmosphere came from layered pads ` +
+        `and a lot of reverb on everything. I wanted it to feel like you were standing ` +
+        `outside in the cold, watching snow fall slowly — calm but a little melancholic.`
+    }
+
+    /*
+    ,
+    mysong: {
+      name:    'My Song Title',
+      artist:  'Dennis van Wijngaarden',
+      year:    '2025',
+      src:     'MySong.mp3',
+      cover:   '🎵',
+      coverImg: null,
+      spotify: null,
+      badges:  ['Released'],
+      about:          'What this song is about...',
+      thoughts:       'Your personal thoughts on it...',
+      behindTheScenes:'How you made it...'
+    }
+    */
+  };
+
+  /* ============================================================
+     AUDIO ENGINE
+  ============================================================ */
+  const audio = document.getElementById('mainAudio');
+  audio.volume = 0.7;
+
+  let isPlaying   = false;
+  let currentKey  = null;
+  let overlayOpen = false;
+
+  function fmt(s) {
+    if (!s || isNaN(s)) return '0:00';
+    const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  function setPlaying(state) {
+    isPlaying = state;
+    const icon = state ? '⏸' : '▶';
+    document.getElementById('ovPlayBtn').textContent = icon;
+    document.getElementById('upPlayBtn').textContent = icon;
+    document.getElementById('ovCover').classList.toggle('spinning', state);
+    document.getElementById('upDisc').classList.toggle('spinning', state);
+  }
+
+  function togglePlay() {
+    if (!audio.src) return;
+    if (isPlaying) { audio.pause(); setPlaying(false); }
+    else { audio.play().then(() => setPlaying(true)).catch(() => {}); }
+  }
+
+  function seekBack() { audio.currentTime = Math.max(0, audio.currentTime - 10); }
+  function seekFwd()  { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10); }
+
+  function barSeek(e, el) {
+    if (!audio.duration) return;
+    const r = el.getBoundingClientRect();
+    audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+  }
+
+  document.getElementById('ovBar').addEventListener('click', e => barSeek(e, document.getElementById('ovBar')));
+  document.getElementById('upBar').addEventListener('click', e => barSeek(e, document.getElementById('upBar')));
+
+  audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    const pct = (audio.currentTime / audio.duration * 100) + '%';
+    document.getElementById('ovFill').style.width = pct;
+    document.getElementById('upFill').style.width = pct;
+    document.getElementById('ovCur').textContent  = fmt(audio.currentTime);
+    document.getElementById('upCur').textContent  = fmt(audio.currentTime);
+  });
+
+  audio.addEventListener('loadedmetadata', () => {
+    const d = fmt(audio.duration);
+    document.getElementById('ovDur').textContent = d;
+    document.getElementById('upDur').textContent = d;
+  });
+
+  audio.addEventListener('ended', () => {
+    setPlaying(false);
+    ['ovFill','upFill'].forEach(id => document.getElementById(id).style.width = '0%');
+  });
+
+  /* ============================================================
+     OVERLAY
+  ============================================================ */
+  function openSong(key) {
+    const song = SONGS[key];
+    if (!song) return;
+
+    // Load audio only if switching songs
+    if (currentKey !== key) {
+      currentKey = key;
+      audio.src = song.src;
+      audio.load();
+      audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    }
+
+    // Cover art
+    const coverEl = document.getElementById('ovCover');
+    if (song.coverImg) {
+      coverEl.innerHTML = `<img src="${song.coverImg}" alt="${song.name}">`;
+    } else {
+      coverEl.textContent = song.cover;
+    }
+
+    // Left panel text
+    document.getElementById('ovName').textContent   = song.name;
+    document.getElementById('ovArtist').textContent = song.artist;
+    document.getElementById('ovVol').value = audio.volume;
+
+    // Bottom bar disc + text
+    const discEl = document.getElementById('upDisc');
+    if (song.coverImg) {
+      discEl.innerHTML = `<img src="${song.coverImg}" alt="${song.name}">`;
+    } else {
+      discEl.textContent = song.cover;
+    }
+    document.getElementById('upTrackText').innerHTML = `
+      <div class="up-track-name">${song.name}</div>
+      <div class="up-track-artist">${song.artist}</div>`;
+
+    // Badges
+    const badgeMap = { Released: 'badge-released', Spotify: 'badge-spotify' };
+    const badgesHTML = (song.badges || [])
+      .map(b => `<span class="badge ${badgeMap[b] || ''}">${b}</span>`).join('');
+
+    // Spotify embed
+    const spotifyHTML = song.spotify ? `
+      <div class="ov-block ov-spotify">
+        <div class="ov-block-title">Listen on Spotify</div>
+        <iframe src="${song.spotify}" width="100%" height="152" frameBorder="0"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"></iframe>
+      </div>` : '';
+
+    // Right panel
+    document.getElementById('ovRight').innerHTML = `
+      <div>
+        <div class="ov-header-label">Song</div>
+        <div class="ov-header-title">${song.name}</div>
+        <div class="ov-header-year">${song.year}</div>
+        <div class="ov-badges">${badgesHTML}</div>
+      </div>
+
+      <div class="ov-block">
+        <div class="ov-block-title">About</div>
+        <p>${song.about}</p>
+      </div>
+
+      <div class="ov-block">
+        <div class="ov-block-title">My Thoughts</div>
+        <p>${song.thoughts}</p>
+      </div>
+
+      <div class="ov-block">
+        <div class="ov-block-title">Behind the Scenes</div>
+        <p>${song.behindTheScenes}</p>
+      </div>
+
+      ${spotifyHTML}
+    `;
+
+    // Show overlay, hide bottom bar
+    overlayOpen = true;
+    document.getElementById('songOverlay').classList.add('open');
+    document.getElementById('universalPlayer').classList.add('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeOverlay() {
+    overlayOpen = false;
+    document.getElementById('songOverlay').classList.remove('open');
+    document.getElementById('universalPlayer').classList.remove('hidden');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlayOpen) closeOverlay();
+  });
+</script>
+
+</body>
+</html>

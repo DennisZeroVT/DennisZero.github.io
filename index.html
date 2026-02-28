@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Me</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: url('backdrop.png') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Verdana, Arial, sans-serif;
+      color: white;
+    }
+
+    /* ============================
+       SIDEBAR / TOP NAV
+    ============================ */
+
+    .sidebar {
+      width: 200px;
+      background: rgba(43, 33, 64, 0.85);
+      height: 100vh;
+      padding: 20px;
+      border-right: 3px solid #ffffff33;
+      position: fixed;
+      top: 0;
+      left: 0;
+      backdrop-filter: blur(2px);
+      z-index: 100;
+    }
+
+    .sidebar button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      background: #4a3568;
+      color: #d6c8ff;
+      border: 2px solid #ffffff55;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: left;
+      box-shadow: 2px 2px 4px #00000055;
+    }
+
+    .sidebar button:hover {
+      background: #6a52a0;
+      border-color: #ffffffaa;
+    }
+
+    /* Mobile top nav (hidden on desktop) */
+    .top-nav {
+      display: none;
+      background: rgba(43, 33, 64, 0.95);
+      border-bottom: 3px solid #ffffff33;
+      padding: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .top-nav button {
+      flex: 1;
+      min-width: 70px;
+      padding: 8px 6px;
+      background: #4a3568;
+      color: #d6c8ff;
+      border: 2px solid #ffffff55;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .top-nav button:hover {
+      background: #6a52a0;
+    }
+
+    /* ============================
+       LAYOUT
+    ============================ */
+
+    .content-wrapper {
+      margin-left: 200px;
+      padding: 20px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .left-column {
+      width: 250px;
+      min-width: 250px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .pfp-box,
+    .bio-box {
+      width: 100%;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid #ffffff33;
+      backdrop-filter: blur(3px);
+      box-shadow: 0 0 10px #000000aa;
+    }
+
+    .pfp-box {
+      height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      overflow: hidden;
+    }
+
+    .pfp-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .bio-box {
+      padding: 15px;
+    }
+
+    .bio-box h3 {
+      margin-bottom: 10px;
+    }
+
+    .bio-box p {
+      line-height: 1.7;
+    }
+
+    .main-panel {
+      flex: 1;
+      min-width: 0;
+      background: rgba(0, 0, 0, 0.65);
+      border: 2px solid #ffffff33;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 10px #000000aa;
+      border-radius: 10px;
+    }
+
+    .main-panel h2 {
+      margin-bottom: 15px;
+    }
+
+    .main-panel > p {
+      margin-bottom: 15px;
+      line-height: 1.7;
+    }
+
+    .main-panel .bio-box {
+      margin-top: 20px;
+    }
+
+    .main-panel .bio-box h3 {
+      margin-bottom: 10px;
+    }
+
+    .main-panel .bio-box p {
+      margin-bottom: 12px;
+      line-height: 1.7;
+    }
+
+    .badge-img {
+      width: 80%;
+      margin-top: 10px;
+      border-radius: 1px;
+      box-shadow: 0 0 10px #000000aa;
+      display: block;
+    }
+
+    .vivid-img {
+      width: 20%;
+      margin-top: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000000aa;
+    }
+
+    iframe {
+      margin-top: 10px;
+      border-radius: 12px;
+      display: block;
+    }
+
+    /* ============================
+       MOBILE STYLES
+    ============================ */
+
+    @media (max-width: 700px) {
+      .sidebar {
+        display: none;
+      }
+
+      .top-nav {
+        display: flex;
+      }
+
+      .content-wrapper {
+        margin-left: 0;
+        padding: 12px;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .left-column {
+        width: 100%;
+        min-width: unset;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      /* PFP takes full width on mobile */
+      .pfp-box {
+        width: 100%;
+        height: 220px;
+      }
+
+      /* Side-by-side bio boxes on mobile */
+      .left-column .bio-box {
+        flex: 1;
+        min-width: 140px;
+      }
+
+      /* Badges box full width */
+      .left-column .bio-box:last-child {
+        width: 100%;
+        flex: unset;
+      }
+
+      /* Badges in a row on mobile */
+      .left-column .bio-box:last-child p {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .badge-img {
+        width: auto;
+        max-width: 120px;
+        margin-top: 0;
+      }
+
+      .vivid-img {
+        width: 40%;
+      }
+
+      .main-panel {
+        padding: 14px;
+      }
+
+      iframe {
+        height: 200px;
+      }
+    }
+
+    /* Tablet */
+    @media (min-width: 701px) and (max-width: 960px) {
+      .sidebar {
+        width: 160px;
+      }
+
+      .content-wrapper {
+        margin-left: 160px;
+        padding: 14px;
+        gap: 14px;
+      }
+
+      .left-column {
+        width: 200px;
+        min-width: 200px;
+      }
+    }
+
+    /* ============================
+       MUSIC PLAYER WIDGET
+    ============================ */
+
+    .music-widget {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 9999;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+    }
+
+    .music-widget.collapsed {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: rgba(74, 53, 104, 0.92);
+      border: 2px solid #ffffff55;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 20px #00000088;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse-ring 2.5s infinite;
+    }
+
+    @keyframes pulse-ring {
+      0%   { box-shadow: 0 4px 20px #00000088, 0 0 0 0   rgba(160,130,255,0.5); }
+      70%  { box-shadow: 0 4px 20px #00000088, 0 0 0 10px rgba(160,130,255,0);   }
+      100% { box-shadow: 0 4px 20px #00000088, 0 0 0 0   rgba(160,130,255,0);   }
+    }
+
+    .music-widget.expanded {
+      width: 280px;
+      height: auto;
+      border-radius: 16px;
+      background: rgba(25, 15, 45, 0.96);
+      border: 2px solid #ffffff33;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 8px 40px #000000cc;
+      cursor: default;
+      padding: 16px;
+      animation: none;
+    }
+
+    .music-collapsed-view {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    .music-icon {
+      font-size: 24px;
+      animation: bounce-note 1.5s ease-in-out infinite;
+    }
+
+    @keyframes bounce-note {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-5px); }
+    }
+
+    .music-expanded-view { display: none; }
+
+    .music-widget.expanded .music-collapsed-view { display: none; }
+    .music-widget.expanded .music-expanded-view  { display: block; }
+
+    .music-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .music-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #9b7fcc;
+      font-family: Verdana, sans-serif;
+    }
+
+    .music-close {
+      background: none;
+      border: none;
+      color: #ffffff66;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: color 0.2s;
+      font-family: Verdana, sans-serif;
+    }
+    .music-close:hover { color: white; }
+
+    .music-track-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .music-disc {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6a3fa0, #3a2060);
+      border: 2px solid #ffffff33;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .music-disc.spinning {
+      animation: spin-disc 4s linear infinite;
+    }
+
+    @keyframes spin-disc {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .music-track-name {
+      font-weight: bold;
+      font-size: 15px;
+      color: white;
+      font-family: Verdana, sans-serif;
+    }
+
+    .music-track-artist {
+      font-size: 11px;
+      color: #9b7fcc;
+      margin-top: 3px;
+      font-family: Verdana, sans-serif;
+    }
+
+    .music-progress-area { margin-bottom: 12px; }
+
+    .music-progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #ffffff22;
+      border-radius: 2px;
+      cursor: pointer;
+      position: relative;
+      margin-bottom: 6px;
+    }
+
+    .music-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #8b5cf6, #c084fc);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.5s linear;
+      pointer-events: none;
+    }
+
+    .music-times {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #9b7fcc;
+      font-family: Verdana, sans-serif;
+    }
+
+    .music-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .ctrl-btn {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid #ffffff33;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .ctrl-btn:hover { background: rgba(255,255,255,0.18); }
+
+    .play-btn {
+      width: 46px;
+      height: 46px;
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      border: none;
+      font-size: 17px;
+    }
+    .play-btn:hover { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
+
+    .music-volume {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .music-volume input[type=range] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 3px;
+      background: #ffffff33;
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .music-volume input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #a78bfa;
+      cursor: pointer;
+    }
+
+    @media (max-width: 700px) {
+      .music-widget.collapsed { bottom: 14px; left: 10px; }
+      .music-widget.expanded  { width: 240px; left: 10px; bottom: 14px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Mobile top nav -->
+<nav class="top-nav">
+  <button onclick="location.href='index.html'">Home</button>
+  <button onclick="location.href='songs.html'">Songs</button>
+</nav>
+
+<!-- Desktop sidebar -->
+<div class="sidebar">
+  <button onclick="location.href='index.html'">Home</button>
+  <button onclick="location.href='songs.html'">Songs</button>
+</div>
+
+<div class="content-wrapper">
+
+  <div class="left-column">
+
+    <div class="pfp-box">
+      <img src="pfp.png" alt="Profile picture">
+    </div>
+
+    <div class="bio-box">
+      <h3>Likes</h3>
+      <p>
+        Sonic.<br>
+        My little Pony.<br>
+        Making music.<br>
+        Music.<br>
+        Old aesthetics.<br>
+        Emulators.<br>
+        Anime.<br>
+        Cats.<br>
+        Blue Archive.<br>
+      </p>
+    </div>
+
+    <div class="bio-box">
+      <h3>Dislikes</h3>
+      <p>
+        Gore.<br>
+        Blood.<br>
+        Spiders.<br>
+        The unknown.<br>
+        Death.<br>
+      </p>
+    </div>
+
+    <div class="bio-box">
+      <h3>Info badges</h3>
+      <p>
+        <img class="badge-img" src="1.png" alt="badge">
+        <img class="badge-img" src="11.png" alt="badge">
+        <img class="badge-img" src="111.png" alt="badge">
+        <img class="badge-img" src="1111.png" alt="badge">
+        <img class="badge-img" src="11111.png" alt="badge">
+        <img class="badge-img" src="111111.png" alt="badge">
+        <img class="badge-img" src="2.png" alt="badge">
+        <img class="badge-img" src="22.png" alt="badge">
+        <img class="badge-img" src="222.png" alt="badge">
+      </p>
+    </div>
+
+  </div>
+
+  <div class="main-panel">
+    <h2>My Story</h2>
+
+    <p>
+      My name is <b>Dennis van Wijngaarden</b>, and I have always had a passion for video games and music. I started creating video games many years ago, and during that time I discovered how much I enjoyed making music. That moment pushed me toward becoming a music producer.
+    </p>
+
+    <p>
+      Over the years, I tried many different DAWs. I started with FL Studio, then moved on to Cubase and Studio One. Each one helped me learn more about producing and finding my own style.
+    </p>
+
+    <div class="bio-box">
+      <h3>My Catalyst Vivid</h3>
+      <p>
+        In 2025, I tried joining Discord communities again for the first time in many years. I slowly started interacting with people, and in my very first server I met someone named VividExile. Even though I often felt alone in that server, I somehow felt connected to him. He seemed troubled by his life, since he is an ex‑military veteran, but he still showed a lot of strength and kindness.
+      </p>
+      <p>
+        As we talked more, I noticed his health and energy were often low, and I tried my best to support him. At the same time, he supported me too. We helped each other through a lot, and that connection meant more than I expected. Looking back, I think the server owner probably hurt his feelings as well, not just mine.
+      </p>
+      <p>
+        Even though the owner of that first server ended up hurting me, meeting Vivid proved that I could keep going and do more than I thought. He was also the reason I became a streamer again, and through him I met many new people, including Erik.
+      </p>
+      <img class="vivid-img" src="vivid.png" alt="Vivid pfp">
+    </div>
+
+    <div class="bio-box">
+      <h3>Meeting Erik and My First Song</h3>
+      <p>
+        When the first server owner turned out to be a bad person, I followed Vivid to a Discord server run by a VTuber. After a few weeks in that community, I came across someone named Erik. I first noticed him because of a Twitter post where he made the Devourer of Gods his pet, and I thought it was really funny. I've always loved Terraria, so it immediately caught my attention.
+      </p>
+      <p>
+        As I started interacting with him, we slowly began collaborating, playing together, as he became my friend. Around that time, I mentioned that I wanted to make a song again, and that I didn't mind making one for free. Erik told me he would love to have a song, and that simple moment was what started everything. Over time, our connection made the idea of creating music feel exciting again.
+      </p>
+      <p>
+        That led to the creation of my first released song. In 2025, I published it on music platforms like Spotify. The track was called <i>Snowfall</i>, and it was made for Erik, also known as eri_k416. The song was written about his character Viona, and it was also the first time I ever wrote lyrics for a song. Because of that, <i>Snowfall</i> became a very special and meaningful project for me.
+      </p>
+      <iframe src="https://open.spotify.com/embed/track/0TxrNlfNSlwuncbt0wpVH6?utm_source=generator"
+        width="100%" height="352" frameBorder="0" allowfullscreen=""
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy"></iframe>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ============================
+     FLOATING MUSIC PLAYER
+============================ -->
+<audio id="bgAudio" src="Suisai.m4a" preload="auto" loop></audio>
+
+<div id="musicWidget" class="music-widget collapsed" onclick="handleWidgetClick(event)">
+
+  <!-- Collapsed: just the note icon -->
+  <div class="music-collapsed-view">
+    <div class="music-icon">♪</div>
+  </div>
+
+  <!-- Expanded: full player -->
+  <div class="music-expanded-view" onclick="event.stopPropagation()">
+    <div class="music-header">
+      <span class="music-label">Now Playing</span>
+      <button class="music-close" onclick="collapsePlayer()">✕</button>
+    </div>
+
+    <div class="music-track-info">
+      <div class="music-disc" id="musicDisc">🎵</div>
+      <div>
+        <div class="music-track-name">Suisai - calm down</div>
+        <div class="music-track-artist">suisai</div>
+      </div>
+    </div>
+
+    <div class="music-progress-area">
+      <div class="music-progress-bar" id="progressBar">
+        <div class="music-progress-fill" id="progressFill"></div>
+      </div>
+      <div class="music-times">
+        <span id="currentTime">0:00</span>
+        <span id="totalTime">0:00</span>
+      </div>
+    </div>
+
+    <div class="music-controls">
+      <button class="ctrl-btn" onclick="seekBack()">⏮</button>
+      <button class="ctrl-btn play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+      <button class="ctrl-btn" onclick="seekForward()">⏭</button>
+    </div>
+
+    <div class="music-volume">
+      <span>🔊</span>
+      <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.7"
+             oninput="audio.volume = this.value">
+    </div>
+  </div>
+</div>
+
+<script>
+  const audio     = document.getElementById('bgAudio');
+  const widget    = document.getElementById('musicWidget');
+  const playBtn   = document.getElementById('playBtn');
+  const disc      = document.getElementById('musicDisc');
+  const fillEl    = document.getElementById('progressFill');
+  const barEl     = document.getElementById('progressBar');
+  const curEl     = document.getElementById('currentTime');
+  const durEl     = document.getElementById('totalTime');
+
+  let isExpanded   = false;
+  let isPlaying    = false;
+  let autoStarted  = false;
+
+  audio.volume = 0.7;
+
+  /* ---------- helpers ---------- */
+  function fmt(s) {
+    const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  function startAudio() {
+    audio.play().then(() => {
+      isPlaying = true;
+      playBtn.textContent = '⏸';
+      disc.classList.add('spinning');
+    }).catch(() => {});
+  }
+
+  /* ---------- autoplay on first interaction ---------- */
+  function onFirstInteraction() {
+    if (autoStarted) return;
+    autoStarted = true;
+    startAudio();
+  }
+  ['click','scroll','keydown','touchstart','mousemove'].forEach(e =>
+    document.addEventListener(e, onFirstInteraction, { once: true, passive: true })
+  );
+
+  /* ---------- widget toggle ---------- */
+  function handleWidgetClick(e) {
+    if (!isExpanded) {
+      e.stopPropagation();
+      isExpanded = true;
+      widget.classList.replace('collapsed', 'expanded');
+    }
+  }
+
+  function collapsePlayer() {
+    isExpanded = false;
+    widget.classList.replace('expanded', 'collapsed');
+  }
+
+  /* ---------- controls ---------- */
+  function togglePlay() {
+    if (isPlaying) {
+      audio.pause();
+      isPlaying = false;
+      playBtn.textContent = '▶';
+      disc.classList.remove('spinning');
+    } else {
+      startAudio();
+    }
+  }
+
+  function seekBack()    { audio.currentTime = Math.max(0, audio.currentTime - 10); }
+  function seekForward() { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10); }
+
+  /* ---------- progress bar click ---------- */
+  barEl.addEventListener('click', e => {
+    if (!audio.duration) return;
+    const r = barEl.getBoundingClientRect();
+    audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+  });
+
+  /* ---------- audio events ---------- */
+  audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    fillEl.style.width = (audio.currentTime / audio.duration * 100) + '%';
+    curEl.textContent  = fmt(audio.currentTime);
+  });
+
+  audio.addEventListener('loadedmetadata', () => {
+    durEl.textContent = fmt(audio.duration);
+  });
+
+  audio.addEventListener('ended', () => {
+    isPlaying = false;
+    playBtn.textContent = '▶';
+    disc.classList.remove('spinning');
+  });
+</script>
+
+</body>
+</html>
+
+</div>
