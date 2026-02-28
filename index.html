@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Background audio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About Me</title>
   <style>
@@ -408,17 +406,10 @@
 
 </div>
 
-  <script>
-    // Try to resume autoplay if the browser blocks it
-    document.addEventListener('click', function once() {
-      const audio = document.getElementById('bg-audio');
-      if (audio.paused) audio.play().catch(() => {});
-      document.removeEventListener('click', once);
-    });
-  </script>
 
 </body>
 
 </html>
+
 
 
