@@ -18,6 +18,33 @@
     }
 
     /* ============================
+       MUSIC PLAYER TOGGLE
+    ============================ */
+
+    .music-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+      background: rgba(74, 53, 104, 0.9);
+      border: 2px solid #ffffff55;
+      color: #d6c8ff;
+      padding: 10px 14px;
+      cursor: pointer;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: bold;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 10px #00000088;
+      transition: background 0.2s;
+    }
+
+    .music-toggle:hover {
+      background: rgba(106, 82, 160, 0.95);
+      border-color: #ffffffaa;
+    }
+
+    /* ============================
        SIDEBAR / TOP NAV
     ============================ */
 
@@ -222,25 +249,21 @@
         gap: 12px;
       }
 
-      /* PFP takes full width on mobile */
       .pfp-box {
         width: 100%;
         height: 220px;
       }
 
-      /* Side-by-side bio boxes on mobile */
       .left-column .bio-box {
         flex: 1;
         min-width: 140px;
       }
 
-      /* Badges box full width */
       .left-column .bio-box:last-child {
         width: 100%;
         flex: unset;
       }
 
-      /* Badges in a row on mobile */
       .left-column .bio-box:last-child p {
         display: flex;
         flex-wrap: wrap;
@@ -289,8 +312,54 @@
 
 <body>
 
-  <!-- Hidden background audio -->
-  
+  <!-- Background music -->
+  <audio id="bgMusic" loop>
+    <source src="Suisai.m4a" type="audio/mp4">
+  </audio>
+
+  <!-- Music toggle button -->
+  <button class="music-toggle" id="musicBtn" onclick="toggleMusic()">♪ Music: ON</button>
+
+  <script>
+    const audio = document.getElementById('bgMusic');
+    const btn = document.getElementById('musicBtn');
+    let playing = false;
+
+    // Autoplay on first user interaction (required by browsers)
+    function startMusic() {
+      if (!playing) {
+        audio.volume = 0.4;
+        audio.play().then(() => {
+          playing = true;
+          btn.textContent = '♪ Music: ON';
+        }).catch(() => {});
+      }
+      document.removeEventListener('click', startMusic);
+    }
+
+    // Try immediate autoplay first
+    audio.volume = 0.4;
+    audio.play().then(() => {
+      playing = true;
+      btn.textContent = '♪ Music: ON';
+    }).catch(() => {
+      // Blocked by browser — wait for first click
+      btn.textContent = '♪ Music: OFF';
+      document.addEventListener('click', startMusic);
+    });
+
+    function toggleMusic() {
+      if (playing) {
+        audio.pause();
+        playing = false;
+        btn.textContent = '♪ Music: OFF';
+      } else {
+        audio.play();
+        playing = true;
+        btn.textContent = '♪ Music: ON';
+      }
+    }
+  </script>
 
 <!-- Mobile top nav -->
 <nav class="top-nav">
@@ -401,10 +470,11 @@
 
 </div>
 
-
 </body>
-
 </html>
+
+
+
 
 
 
