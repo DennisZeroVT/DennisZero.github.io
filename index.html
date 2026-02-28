@@ -289,6 +289,11 @@
 
 <body>
 
+<!-- Invisible Audio Player -->
+<audio id="backgroundAudio" preload="auto">
+  <source src="Suisai.m4a" type="audio/mp4">
+</audio>
+
 <!-- Mobile top nav -->
 <nav class="top-nav">
   <button onclick="location.href='index.html'">Home</button>
@@ -397,6 +402,31 @@
   </div>
 
 </div>
+
+<script>
+  const audioElement = document.getElementById('backgroundAudio');
+  let audioStarted = false;
+
+  // Function to start audio playback
+  function startAudio() {
+    if (!audioStarted) {
+      audioElement.play().catch(error => {
+        console.log('Audio autoplay prevented:', error);
+      });
+      audioStarted = true;
+    }
+  }
+
+  // Listen for user interactions
+  document.addEventListener('click', startAudio);
+  document.addEventListener('touchstart', startAudio);
+  document.addEventListener('keydown', startAudio);
+
+  // Also try to start on page load (may be blocked by browser autoplay policy)
+  window.addEventListener('load', () => {
+    startAudio();
+  });
+</script>
 
 </body>
 </html>
