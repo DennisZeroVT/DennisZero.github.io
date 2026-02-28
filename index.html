@@ -395,6 +395,30 @@
   box-shadow: 0 0 10px #000000aa;
   min-width: 140px;
 }
+      /* Collapsed state */
+.music-controls.collapsed {
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hide inner content when collapsed */
+.music-controls.collapsed .music-button,
+.music-controls.collapsed .volume-container {
+  display: none;
+}
+
+/* Show a simple icon when collapsed */
+.music-controls.collapsed::after {
+  content: "🎵";
+  font-size: 24px;
+  color: #d6c8ff;
+}
 
 /* Expanded state */
 .music-wrapper.expanded .music-controls {
@@ -454,7 +478,7 @@
 <div class="music-wrapper" id="musicWrapper">
   <button class="music-toggle-btn" onclick="toggleMusicPanel()">🎵</button>
 
-  <div class="music-controls">
+  <div class="music-controls" id="musicControls" onclick="toggleMusicPanel()">
     <button class="music-button" id="musicToggle" onclick="toggleMusic()">🎵 Play Music</button>
 
     <div class="volume-container">
@@ -565,9 +589,10 @@
 <script>
 
   function toggleMusicPanel() {
-  const wrapper = document.getElementById('musicWrapper');
-  wrapper.classList.toggle('expanded');
+  const panel = document.getElementById('musicControls');
+  panel.classList.toggle('collapsed');
 }
+
  
   const bgMusic = document.getElementById('bgMusic');
   const musicToggle = document.getElementById('musicToggle');
