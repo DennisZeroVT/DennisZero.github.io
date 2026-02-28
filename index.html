@@ -195,94 +195,6 @@
     }
 
     /* ============================
-       MUSIC CONTROLS (Bottom Left)
-    ============================ */
-
-    .music-controls {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      background: rgba(43, 33, 64, 0.95);
-      border: 2px solid #ffffff33;
-      border-radius: 10px;
-      padding: 15px;
-      backdrop-filter: blur(4px);
-      box-shadow: 0 0 10px #000000aa;
-      z-index: 200;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      min-width: 140px;
-    }
-
-    .music-button {
-      padding: 10px 15px;
-      background: #4a3568;
-      color: #d6c8ff;
-      border: 2px solid #ffffff55;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 5px;
-      transition: all 0.3s ease;
-      font-size: 13px;
-      text-align: center;
-    }
-
-    .music-button:hover {
-      background: #6a52a0;
-      border-color: #ffffffaa;
-    }
-
-    .music-button.playing {
-      background: #2d7f2d;
-      border-color: #88ff88;
-    }
-
-    .volume-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .volume-label {
-      font-size: 12px;
-      color: #d6c8ff;
-      white-space: nowrap;
-    }
-
-    .volume-slider {
-      flex: 1;
-      height: 6px;
-      cursor: pointer;
-      background: #ffffff33;
-      border-radius: 3px;
-      -webkit-appearance: none;
-      appearance: none;
-      outline: none;
-    }
-
-    .volume-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 14px;
-      height: 14px;
-      background: #d6c8ff;
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 0 3px #000000aa;
-    }
-
-    .volume-slider::-moz-range-thumb {
-      width: 14px;
-      height: 14px;
-      background: #d6c8ff;
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 0 3px #000000aa;
-      border: none;
-    }
-
-    /* ============================
        MOBILE STYLES
     ============================ */
 
@@ -353,84 +265,6 @@
       iframe {
         height: 200px;
       }
-
-      /* Expandable Music Player */
-.music-wrapper {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  z-index: 200;
-}
-
-/* Small collapsed button */
-.music-toggle-btn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #4a3568;
-  color: #d6c8ff;
-  border: 2px solid #ffffff55;
-  font-size: 20px;
-  cursor: pointer;
-  box-shadow: 0 0 10px #000000aa;
-  transition: all 0.3s ease;
-}
-
-.music-toggle-btn:hover {
-  background: #6a52a0;
-}
-
-/* Hidden panel */
-.music-controls {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(10px);
-  transition: all 0.3s ease;
-  background: rgba(43, 33, 64, 0.95);
-  border: 2px solid #ffffff33;
-  border-radius: 10px;
-  padding: 15px;
-  margin-top: 10px;
-  backdrop-filter: blur(4px);
-  box-shadow: 0 0 10px #000000aa;
-  min-width: 140px;
-}
-      /* Collapsed state */
-.music-controls.collapsed {
-  width: 50px;
-  height: 50px;
-  padding: 0;
-  overflow: hidden;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Hide inner content when collapsed */
-.music-controls.collapsed .music-button,
-.music-controls.collapsed .volume-container {
-  display: none;
-}
-
-/* Show a simple icon when collapsed */
-.music-controls.collapsed::after {
-  content: "🎵";
-  font-size: 24px;
-  color: #d6c8ff;
-}
-
-/* Expanded state */
-.music-wrapper.expanded .music-controls {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-      .music-button {
-        padding: 8px 12px;
-        font-size: 12px;
-      }
     }
 
     /* Tablet */
@@ -455,12 +289,6 @@
 
 <body>
 
-<!-- Audio Element (Hidden) -->
-<audio id="bgMusic">
-  <source src="Suisai.m4a" type="audio/mp4">
-  Your browser does not support the audio element.
-</audio>
-
 <!-- Mobile top nav -->
 <nav class="top-nav">
   <button onclick="location.href='index.html'">Home</button>
@@ -472,22 +300,6 @@
   <button onclick="location.href='index.html'">Home</button>
   <button onclick="location.href='songs.html'">Songs</button>
 </div>
-
-<!-- Music Controls -->
-<!-- Expandable Music Player -->
-<div class="music-wrapper" id="musicWrapper">
-  <button class="music-toggle-btn" onclick="toggleMusicPanel()">🎵</button>
-
-  <div class="music-controls" id="musicControls" onclick="toggleMusicPanel()">
-    <button class="music-button" id="musicToggle" onclick="toggleMusic()">🎵 Play Music</button>
-
-    <div class="volume-container">
-      <span class="volume-label">🔊</span>
-      <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70" onchange="setVolume()">
-    </div>
-  </div>
-</div>
-
 
 <div class="content-wrapper">
 
@@ -585,76 +397,6 @@
   </div>
 
 </div>
-
-<script>
-
-  function toggleMusicPanel() {
-  const panel = document.getElementById('musicControls');
-  panel.classList.toggle('collapsed');
-}
-
- 
-  const bgMusic = document.getElementById('bgMusic');
-  const musicToggle = document.getElementById('musicToggle');
-  const volumeSlider = document.getElementById('volumeSlider');
-  let isPlaying = false;
-  let userInteracted = false;
-
-  // Function to toggle music
-  function toggleMusic() {
-    if (isPlaying) {
-      bgMusic.pause();
-      isPlaying = false;
-      musicToggle.textContent = '🎵 Play Music';
-      musicToggle.classList.remove('playing');
-    } else {
-      bgMusic.play().catch(error => {
-        console.log('Autoplay prevented:', error);
-      });
-      isPlaying = true;
-      musicToggle.textContent = '⏸ Stop Music';
-      musicToggle.classList.add('playing');
-    }
-  }
-
-  // Function to set volume
-  function setVolume() {
-    bgMusic.volume = volumeSlider.value / 100;
-  }
-
-  // Initialize volume
-  setVolume();
-
-  // Detect user interaction (scroll, click, etc.) to enable autoplay
-  function enableAutoplay() {
-    if (!userInteracted) {
-      userInteracted = true;
-      // Auto-play the music on first user interaction
-      bgMusic.play().catch(error => {
-        console.log('Autoplay prevented:', error);
-      });
-      isPlaying = true;
-      musicToggle.textContent = '⏸ Stop Music';
-      musicToggle.classList.add('playing');
-      
-      // Remove event listeners after first interaction
-      document.removeEventListener('click', enableAutoplay);
-      document.removeEventListener('scroll', enableAutoplay);
-      document.removeEventListener('keydown', enableAutoplay);
-    }
-  }
-
-  // Add event listeners for user interactions
-  document.addEventListener('click', enableAutoplay);
-  document.addEventListener('scroll', enableAutoplay);
-  document.addEventListener('keydown', enableAutoplay);
-
-  // Loop the music
-  bgMusic.addEventListener('ended', () => {
-    bgMusic.currentTime = 0;
-    bgMusic.play();
-  });
-</script>
 
 </body>
 </html>
